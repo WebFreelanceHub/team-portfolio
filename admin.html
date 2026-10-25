@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Admin | WebFreelanceHub</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0e0f2e;--bg2:#16184a;--pink:#ff5d8f;--cyan:#3de0ff;--txt:#f2f1ff;--mut:#a9a8d6;--line:rgba(255,255,255,.15)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh}
+.hide{display:none!important}
+.box{max-width:380px;margin:12vh auto;padding:30px;background:var(--bg2);border-radius:18px;display:grid;gap:12px}
+input,textarea,select{width:100%;padding:11px 14px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--txt);font:inherit}
+textarea{min-height:80px}
+button{font:inherit;cursor:pointer;border-radius:99px;border:0;padding:10px 20px;font-weight:700;background:var(--pink);color:#fff}
+button.ghost{background:none;border:1px solid var(--line);color:var(--txt)}
+button.del{background:#c0344f}
+header{display:flex;justify-content:space-between;align-items:center;padding:14px 5%;background:var(--bg2);flex-wrap:wrap;gap:10px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;padding:16px 5%}
+.tabs button{background:none;border:1px solid var(--line);color:var(--txt)}
+.tabs button.on{background:var(--cyan);color:var(--bg);border-color:var(--cyan)}
+main{padding:0 5% 60px;max-width:1000px;margin:auto}
+.bar{display:flex;justify-content:space-between;align-items:center;margin:10px 0 16px}
+.item{display:flex;gap:14px;align-items:center;padding:14px;margin-bottom:10px;background:var(--bg2);border-radius:14px}
+.item img{width:56px;height:56px;border-radius:10px;object-fit:cover}
+.item .t{flex:1;min-width:0}.item .t small{color:var(--mut);display:block;overflow-wrap:anywhere}
+.item .act{display:flex;gap:8px;flex-wrap:wrap}
+.badge{font-size:.75rem;padding:2px 10px;border-radius:99px;background:#3a3d7a}.badge.ok{background:#12a150}
+dialog{margin:auto;width:min(520px,94vw);border:0;border-radius:18px;padding:24px;background:var(--bg2);color:var(--txt)}
+dialog::backdrop{background:rgba(0,0,0,.6)}
+form{display:grid;gap:12px}label{font-size:.85rem;color:var(--mut)}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--cyan);color:var(--bg);padding:10px 22px;border-radius:99px;font-weight:700;opacity:0;transition:.3s;pointer-events:none}
+#toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<div id="login" class="box hide">
+  <h2>Admin Login</h2>
+  <input id="email" type="email" placeholder="Email" autocomplete="username">
+  <input id="password" type="password" placeholder="Password" autocomplete="current-password">
+  <button id="loginBtn">Login</button>
+</div>
+
+<div id="dash" class="hide">
+  <header><b>WebFreelanceHub Admin</b><div><a href="index.html" style="color:var(--cyan);margin-right:14px">View site</a><button class="ghost" id="logoutBtn">Logout</button></div></header>
+  <div class="tabs" id="tabs"></div>
+  <main><div class="bar"><h2 id="ttl"></h2><button id="addBtn">+ Add new</button></div><div id="list"></div></main>
+</div>
+
+<dialog id="dlg"><form id="frm"></form></dialog>
+<div id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

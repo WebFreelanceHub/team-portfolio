@@ -20,34 +20,49 @@ const faqs=[
 const tech=['HTML','CSS','JavaScript','PHP','MySQL','Supabase','WordPress','Figma','GitHub','SEO'];
 
 const $=s=>document.querySelector(s);
-const esc=t=>String(t??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
 /* ===== RENDER ===== */
 $('#marquee').innerHTML=[...tech,...tech].map(t=>`<span>✦ ${t}</span>`).join('');
-$('#team-grid').innerHTML=team.map(m=>`<div class="card tilt" data-r>
- ${m.photo_url?`<img class="avatar" src="${esc(m.photo_url)}" alt="${esc(m.name)}">`:`<div class="avatar">${esc(m.name[0])}</div>`}
- <h3>${esc(m.name)}</h3><p>${esc(m.role)}</p><small>${(m.skills||[]).map(esc).join(' • ')}</small></div>`).join('');
-$('#reviews-grid').innerHTML=reviews.map(r=>`<div class="card tilt" data-r>
- <div class="stars">${'★'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div><p>"${esc(r.review_text)}"</p><h3>${esc(r.client_name)}</h3></div>`).join('');
-$('#faq-list').innerHTML=faqs.map(f=>`<details data-r><summary>${esc(f[0])}</summary><p>${esc(f[1])}</p></details>`).join('');
-
-function showProjects(cat){
- const list=cat==='All'?projects:projects.filter(p=>p.category===cat);
- $('#projects-grid').innerHTML=list.map(p=>`<div class="card tilt in" data-r>
-  <div class="thumb">${p.image_url?`<img src="${esc(p.image_url)}" alt="${esc(p.title)} website screenshot" loading="lazy" onerror="this.remove()">`:''}</div>
-  <h3>${esc(p.title)}</h3><p>${esc(p.description)}</p><small>${(p.tech||[]).map(esc).join(' • ')}</small><br>
-  <a class="lnk" href="${esc(p.demo_url)}" target="_blank" rel="noopener">Live Demo</a>
-  <a class="lnk" href="${esc(p.github_url)}" target="_blank" rel="noopener">GitHub</a></div>`).join('');
+const LIVE=typeof SUPABASE_URL!=='undefined'&&!SUPABASE_URL.includes('YOUR-');
+function renderTeam(inst){
+ $('#team-grid').innerHTML=team.map(m=>`<div class="card tilt${inst?' in':''}" data-r>
+  <div class="avatar">${esc((m.name||'?')[0])}</div>
+  <h3>${esc(m.name)}</h3><p>${esc(m.role)}</p><small>${(m.skills||[]).map(esc).join(' • ')}</small></div>`).join('');
+ document.querySelectorAll('#team-grid .avatar').forEach((a,k)=>{
+  const p=team[k]&&team[k].photo_url;if(!p)return;
+  const im=new Image();im.alt=team[k].name;im.loading='lazy';im.onerror=()=>im.remove();im.src=p;a.appendChild(im);
+ });
  bindTilt();
 }
-const cats=['All',...new Set(projects.map(p=>p.category))];
-$('#tabs').innerHTML=cats.map((c,i)=>`<button class="${i?'':'on'}">${esc(c)}</button>`).join('');
+function renderReviews(inst){
+ $('#reviews-grid').innerHTML=reviews.map(r=>`<div class="card tilt${inst?' in':''}" data-r>
+  <div class="stars">${'★'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div><p>"${esc(r.review_text)}"</p><h3>${esc(r.client_name)}</h3></div>`).join('');
+ bindTilt();
+}
+renderTeam();
+if(!LIVE)renderReviews();
+$('#faq-list').innerHTML=faqs.map(f=>`<details data-r><summary>${esc(f[0])}</summary><p>${esc(f[1])}</p></details>`).join('');
+
+let ptab='all';
+function buildTabs(){
+ const n=projects.filter(isLive).length;
+ ptab=n?'live':'all';
+ $('#tabs').innerHTML=`<button data-t="live" class="${ptab==='live'?'on':''}">Live Projects (${n})</button><button data-t="all" class="${ptab==='all'?'on':''}">All Projects (${projects.length})</button>`;
+ showProjects();
+}
+function showProjects(){
+ const list=ptab==='live'?projects.filter(isLive):projects;
+ $('#projects-grid').innerHTML=list.slice(0,6).map(projectCard).join('')||'<p class="sub" style="grid-column:1/-1">Projects coming soon.</p>';
+ $('#proj-more').innerHTML=projects.length>6?'<a class="btn primary" href="projects.html">See all projects →</a>':'';
+ bindTilt();
+}
+buildTabs();
 $('#tabs').addEventListener('click',e=>{
- if(e.target.tagName!=='BUTTON')return;
- document.querySelectorAll('#tabs button').forEach(b=>b.classList.remove('on'));
- e.target.classList.add('on');showProjects(e.target.textContent);
+ const b=e.target.closest('button');if(!b)return;
+ ptab=b.dataset.t;
+ document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x===b));
+ showProjects();
 });
-showProjects('All');
 
 /* ===== EFFECTS ===== */
 addEventListener('load',()=>setTimeout(()=>$('#loader').classList.add('done'),700));
@@ -105,20 +120,16 @@ $('#menu').onclick=()=>$('#menu').classList.remove('open');
 // contact form -> WhatsApp (baad mein Supabase messages table)
 $('#contact-form').addEventListener('submit',e=>{
  e.preventDefault();
- const t=`Hi! I'm ${$('#f-name').value} (${$('#f-email').value}). ${$('#f-msg').value}`;
- open('https://wa.me/91XXXXXXXXXX?text='+encodeURIComponent(t),'_blank');
+ const name=$('#f-name').value.trim(),email=$('#f-email').value.trim(),msg=$('#f-msg').value.trim();
+ if(LIVE)db.from('messages').insert({name,email,message:msg}).then(({error})=>{if(error)console.error(error)});
+ open('https://wa.me/91XXXXXXXXXX?text='+encodeURIComponent(`Hi! I'm ${name} (${email}). ${msg}`),'_blank');
+ e.target.reset();
 });
 
 /* ================= V2 UPGRADES ================= */
 const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const fine=matchMedia('(pointer: fine)').matches;
 const store={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}}};
-
-/* photos: images/ folder se, na mile to initial / gradient dikhta hai */
-document.querySelectorAll('#team-grid .avatar').forEach((a,i)=>{
- const p=team[i]&&team[i].photo_url; if(!p)return;
- const im=new Image();im.alt=team[i].name;im.loading='lazy';im.onerror=()=>im.remove();im.src=p;a.appendChild(im);
-});
 
 /* dark / light */
 const root=document.documentElement;
@@ -206,3 +217,19 @@ $('#qr').addEventListener('click',e=>{
  m.insertAdjacentHTML('beforeend',`<div class="m me">${k}</div>`);
  setTimeout(()=>{m.insertAdjacentHTML('beforeend',`<div class="m bot">${qa[k]}</div>`);m.scrollTop=m.scrollHeight},400);
 });
+
+/* ===== LIVE DATA (Supabase) ===== */
+(async function loadLive(){
+ if(!LIVE)return;
+ try{
+  const [t,p,r]=await Promise.all([
+   db.from('team').select('*').order('sort_order'),
+   db.from('projects').select('*').order('created_at',{ascending:false}),
+   db.from('reviews').select('*').eq('approved',true).order('created_at',{ascending:false})]);
+  if(t.data&&t.data.length){team.length=0;team.push(...t.data);renderTeam(true)}
+  if(p.data&&p.data.length){projects.length=0;projects.push(...p.data);buildTabs()}
+  reviews.length=0;
+  if(r.data&&r.data.length){reviews.push(...r.data);renderReviews(true)}
+  else $('#reviews-grid').innerHTML='<div class="card in" data-r style="grid-column:1/-1;max-width:520px;margin:auto;text-align:center"><i>⭐</i><h3>Reviews coming soon</h3><p>Hamare pehle clients ke reviews jaldi yahan dikhenge.</p></div>';
+ }catch(err){console.error(err)}
+})();
