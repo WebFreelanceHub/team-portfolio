@@ -1,46 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>WebFreelanceHub | Websites for Local Businesses</title>
-  <meta name="description" content="Freelance web development team: websites, e-commerce and custom PHP development.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WebFreelanceHub | Website Developers in Mumbai for Local Businesses</title>
+<meta name="description" content="Freelance web development team from Mumbai. Fast business websites, e-commerce stores and custom PHP development for shops, restaurants and startups.">
+<meta name="keywords" content="web developer Mumbai, freelance website developer, PHP developer, business website, e-commerce website">
+<meta name="theme-color" content="#0e0f2e">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ff5d8f'/%3E%3Cstop offset='1' stop-color='%233de0ff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url(%23g)'/%3E%3Ctext x='32' y='45' font-size='36' font-family='Arial' font-weight='700' text-anchor='middle' fill='white'%3EW%3C/text%3E%3C/svg%3E">
+<link rel="canonical" href="https://YOUR-SITE.vercel.app/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="WebFreelanceHub | Websites that get you customers">
+<meta property="og:description" content="4 developers from Mumbai building fast, modern websites for local businesses.">
+<meta property="og:image" content="https://YOUR-SITE.vercel.app/images/og.png">
+<meta property="og:url" content="https://YOUR-SITE.vercel.app/">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"ProfessionalService","name":"WebFreelanceHub","description":"Freelance web development team in Mumbai","url":"https://YOUR-SITE.vercel.app/","areaServed":"Mumbai, India","address":{"@type":"PostalAddress","addressLocality":"Mumbai","addressCountry":"IN"},"serviceType":["Website development","E-commerce development","PHP development"]}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+<div id="loader"><span>WebFreelanceHub</span></div>
+<div class="glow" id="glow"></div>
+<div class="cur-dot" id="cdot"></div><div class="cur-ring" id="cring"></div>
+<div class="progress" id="progress"></div>
 
-  <header class="navbar">
-    <a href="#home" class="logo">WebFreelance<span>Hub</span></a>
-    <nav>
-      <a href="#about">About</a>
-      <a href="#services">Services</a>
-      <a href="#team">Team</a>
-      <a href="#projects">Projects</a>
-      <a href="#reviews">Reviews</a>
-      <a href="#contact">Contact</a>
-    </nav>
-  </header>
+<header class="nav">
+  <a href="#home" class="logo"><svg width="28" height="28" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff5d8f"/><stop offset="1" stop-color="#3de0ff"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#lg)"/><text x="32" y="45" font-size="36" font-weight="700" text-anchor="middle" fill="#fff" font-family="Arial">W</text></svg>WebFreelance<b>Hub</b></a>
+  <div class="tools"><button class="tool" id="theme" aria-label="Toggle theme">🌓</button></div>
+  <button class="burger" id="burger" aria-label="Menu">☰</button>
+  <nav id="menu">
+    <a href="#about">About</a><a href="#services">Services</a><a href="#team">Team</a>
+    <a href="#projects">Projects</a><a href="#pricing">Pricing</a><a href="#reviews">Reviews</a>
+    <a href="#contact" class="pill">Get a Quote</a>
+  </nav>
+</header>
 
-  <section id="home" class="hero">
-    <h1>We build websites that <span>bring you customers</span></h1>
-    <p>A team of 4 developers making fast, modern websites for shops, restaurants and startups.</p>
-    <div class="hero-buttons">
-      <a href="#contact" class="btn btn-primary">Get a Quote</a>
-      <a href="#projects" class="btn btn-outline">View Projects</a>
-    </div>
-  </section>
+<section id="home" class="hero">
+  <canvas id="fx"></canvas><div class="blobs" id="blobs"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
+  <h1 class="big">We build <span class="grad">websites</span><br>that get you <span class="grad">customers</span></h1>
+  <p class="lead">4 developers from Mumbai. We are <span id="typed" class="typed"></span></p>
+  <div class="row">
+    <a href="#contact" class="btn primary magnet">Get a Quote</a>
+    <a href="#projects" class="btn ghost magnet">View Projects</a>
+  </div>
+</section>
 
-  <section id="about"><h2>About</h2></section>
-  <section id="services"><h2>Services</h2></section>
-  <section id="team"><h2>Team</h2></section>
-  <section id="projects"><h2>Projects</h2></section>
-  <section id="reviews"><h2>Reviews</h2></section>
-  <section id="contact"><h2>Contact</h2></section>
+<div class="marquee"><div class="track" id="marquee"></div></div>
 
-  <!-- WhatsApp: apna number daalo (91 + 10 digit, bina + ya space) -->
-  <a href="https://wa.me/91XXXXXXXXXX" class="whatsapp" target="_blank" aria-label="Chat on WhatsApp">💬</a>
+<section id="about" class="sec">
+  <h2 data-r>About us</h2>
+  <p class="sub" data-r>Hum 4 friends hain jo local businesses ko online laate hain.</p>
+  <div class="stats">
+    <div class="stat" data-r><b data-n="4">0</b><span>Developers</span></div>
+    <div class="stat" data-r><b data-n="10">0</b><span>Projects built</span></div>
+    <div class="stat" data-r><b data-n="100">0</b><span>% mobile friendly</span></div>
+    <div class="stat" data-r><b data-n="24">0</b><span>Hour reply time</span></div>
+  </div>
+</section>
 
+<section id="services" class="sec alt">
+  <h2 data-r>What we build</h2>
+  <p class="sub" data-r>Jo bhi aapke business ko chahiye, ek hi team se.</p>
+  <div class="grid">
+    <div class="card tilt" data-r><i>🌐</i><h3>Business Website</h3><p>Fast, modern sites that look great on every phone.</p></div>
+    <div class="card tilt" data-r><i>🛒</i><h3>E-commerce</h3><p>Online store with products, cart and order management.</p></div>
+    <div class="card tilt" data-r><i>⚙️</i><h3>PHP / Custom</h3><p>Booking systems, admin panels and custom features.</p></div>
+    <div class="card tilt" data-r><i>🛠️</i><h3>Maintenance</h3><p>Updates, fixes and backups after your launch.</p></div>
+  </div>
+</section>
+
+<section id="team" class="sec">
+  <h2 data-r>Meet the team</h2>
+  <p class="sub" data-r>Aapka project seedha inhi ke haath mein.</p>
+  <div class="grid" id="team-grid"></div>
+</section>
+
+<section id="projects" class="sec alt">
+  <h2 data-r>Our projects</h2>
+  <div class="tabs" id="tabs"></div>
+  <div class="grid" id="projects-grid"></div>
+</section>
+
+<section id="process" class="sec">
+  <h2 data-r>How we work</h2>
+  <div class="steps">
+    <div class="step" data-r><b>1</b><h3>Discuss</h3><p>Aapki zaroorat samajhte hain.</p></div>
+    <div class="step" data-r><b>2</b><h3>Design</h3><p>Layout banake aapko dikhate hain.</p></div>
+    <div class="step" data-r><b>3</b><h3>Build</h3><p>Code likhte hain, updates share karte hain.</p></div>
+    <div class="step" data-r><b>4</b><h3>Launch</h3><p>Site live, aur support aage bhi.</p></div>
+  </div>
+</section>
+
+<section id="pricing" class="sec alt">
+  <h2 data-r>Packages</h2>
+  <p class="sub" data-r>Sample pricing. Apne rates yahan badal lo.</p>
+  <div class="grid">
+    <div class="card tilt" data-r><h3>Basic</h3><div class="price">₹7,999</div><p>1-page website, mobile ready, contact form</p></div>
+    <div class="card tilt hot" data-r><h3>Standard</h3><div class="price">₹14,999</div><p>5 pages, WhatsApp chat, basic SEO, animations</p></div>
+    <div class="card tilt" data-r><h3>Custom</h3><div class="price">Let's talk</div><p>E-commerce, PHP apps, admin panel</p></div>
+  </div>
+</section>
+
+<section id="reviews" class="sec">
+  <h2 data-r>Client reviews</h2>
+  <div class="grid" id="reviews-grid"></div>
+</section>
+
+<section id="faq" class="sec alt">
+  <h2 data-r>FAQ</h2>
+  <div class="faq" id="faq-list"></div>
+</section>
+
+<section id="contact" class="sec">
+  <h2 data-r>Let's talk</h2>
+  <p class="sub" data-r>Message bhejo, 24 ghante mein reply milega.</p>
+  <form id="contact-form" class="form" data-r>
+    <input id="f-name" placeholder="Your name" required>
+    <input id="f-email" type="email" placeholder="Email" required>
+    <textarea id="f-msg" rows="4" placeholder="Tell us about your project" required></textarea>
+    <button class="btn primary" type="submit">Send on WhatsApp</button>
+  </form>
+</section>
+
+<footer>© 2026 WebFreelanceHub · Mumbai, India</footer>
+<a href="https://wa.me/91XXXXXXXXXX" class="wa" target="_blank" rel="noopener" aria-label="Chat on WhatsApp"><span class="wa-tip">Chat with us</span><svg viewBox="0 0 24 24" width="32" height="32" fill="#fff" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg></a>
+<script src="js/main.js"></script>
 </body>
 </html>
