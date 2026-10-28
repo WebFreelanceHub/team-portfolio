@@ -1,8 +1,8 @@
 /* ===== DATA (baad mein Supabase se aayega; same field names rakhe hain) ===== */
 const team=[
- {name:'Anuja Chavan',role:'PHP & Backend Developer',skills:['PHP','MySQL','Supabase'],photo_url:'images/anuja.jpg'},
- {name:'Minal',role:'Frontend Developer',skills:['HTML','CSS','JavaScript'],photo_url:'images/minal.jpg'},
- {name:'Pinky',role:'UI / UX Designer',skills:['Figma','CSS','Branding'],photo_url:'images/pinky.jpg'},
+ {name:'Anuja Chavan',role:'PHP & Backend Developer',skills:['PHP','MySQL','Supabase'],info:'I build PHP and Supabase backends and admin panels. I love turning a business idea into a fast, working website.',photo_url:'images/anuja.jpg'},
+ {name:'Minal',role:'Frontend Developer',skills:['HTML','CSS','JavaScript'],info:'Frontend developer focused on clean, responsive and animated pages.',photo_url:'images/minal.jpg'},
+ {name:'Pinky',role:'UI / UX Designer',skills:['Figma','CSS','Branding'],info:'UI/UX designer who plans layouts, colours and brand look before a single line of code.',photo_url:'images/pinky.jpg'},
  {name:'Member 4',role:'Full-stack Developer',skills:['JS','PHP','SEO'],photo_url:'images/member4.jpg'}];
 const projects=[
  {title:'Restaurant Website',description:'Menu, gallery and table booking.',tech:['HTML','CSS','JS'],category:'Website',image_url:'images/project-1.jpg',demo_url:'#',github_url:'#'},
@@ -24,16 +24,80 @@ const $=s=>document.querySelector(s);
 /* ===== RENDER ===== */
 $('#marquee').innerHTML=[...tech,...tech].map(t=>`<span>✦ ${t}</span>`).join('');
 const LIVE=typeof SUPABASE_URL!=='undefined'&&!SUPABASE_URL.includes('YOUR-');
+const safeUrl=u=>/^https?:\/\//i.test((u||'').trim())?u.trim():'';
 function renderTeam(inst){
- $('#team-grid').innerHTML=team.map(m=>`<div class="card tilt${inst?' in':''}" data-r>
-  <div class="avatar">${esc((m.name||'?')[0])}</div>
-  <h3>${esc(m.name)}</h3><p>${esc(m.role)}</p><small>${(m.skills||[]).map(esc).join(' • ')}</small></div>`).join('');
- document.querySelectorAll('#team-grid .avatar').forEach((a,k)=>{
-  const p=team[k]&&team[k].photo_url;if(!p)return;
-  const im=new Image();im.alt=team[k].name;im.loading='lazy';im.onerror=()=>im.remove();im.src=p;a.appendChild(im);
- });
+ $('#team-grid').innerHTML=team.map((m,i)=>{
+  const sk=m.skills||[],more=sk.length>4?`<span>+${sk.length-4}</span>`:'';
+  return `<div class="card tilt tcard${inst?' in':''}" data-r data-i="${i}">
+  <div class="avatar">${esc((m.name||'?')[0])}${m.photo_url?`<img src="${esc(m.photo_url)}" alt="${esc(m.name)}" loading="lazy" onerror="this.remove()">`:''}</div>
+  <h3>${esc(m.name)}</h3><p>${esc(m.role)}</p>
+  <div class="chips">${sk.slice(0,4).map(t=>`<span>${esc(t)}</span>`).join('')}${more}</div>
+  <button type="button" class="btn-view" aria-label="View ${esc(m.name)} profile">View profile →</button></div>`;
+ }).join('');
  bindTilt();
 }
+
+/* ===== TEAM MODAL (View profile) ===== */
+document.body.insertAdjacentHTML('beforeend',`
+<div class="tmodal" id="tmodal" aria-hidden="true">
+ <div class="tbox" role="dialog" aria-modal="true" aria-labelledby="tm-name" tabindex="-1">
+  <button type="button" class="tclose" id="tm-close" aria-label="Close">✕</button>
+  <div id="tm-body"></div>
+  <div class="tnav"><button type="button" id="tm-prev">← Prev</button><span id="tm-count"></span><button type="button" id="tm-next">Next →</button></div>
+ </div>
+</div>`);
+let tmIdx=0,tmLast=null;
+function fillMember(i){
+ const n=team.length;tmIdx=(i+n)%n;
+ const m=team[tmIdx],sk=m.skills||[],li=safeUrl(m.linkedin_url),gh=safeUrl(m.github_url);
+ $('#tm-body').innerHTML=`
+  <div class="tcols${m.info?'':' solo'}">
+   <div class="tleft">
+    <div class="tavatar">${esc((m.name||'?')[0])}${m.photo_url?`<img src="${esc(m.photo_url)}" alt="${esc(m.name)}" onerror="this.remove()">`:''}</div>
+    <h3 id="tm-name">${esc(m.name)}</h3>
+    <div class="trole">${esc(m.role)}</div>
+    ${sk.length?`<div class="chips tskills">${sk.map(t=>`<span>${esc(t)}</span>`).join('')}</div>`:''}
+    ${(li||gh)?`<div class="pbtns tlinks">${li?`<a class="fill" href="${esc(li)}" target="_blank" rel="noopener">LinkedIn ↗</a>`:''}${gh?`<a href="${esc(gh)}" target="_blank" rel="noopener">GitHub ↗</a>`:''}</div>`:''}
+   </div>
+   ${m.info?`<div class="tright"><h4>About</h4><p class="tinfo">${esc(m.info).replace(/\n/g,'<br>')}</p></div>`:''}
+  </div>`;
+ $('#tm-count').textContent=`${tmIdx+1} / ${n}`;
+ $('.tnav').style.display=n>1?'flex':'none';
+ $('.tbox').scrollTop=0;
+}
+function openMember(i){
+ tmLast=document.activeElement;
+ fillMember(i);
+ const m=$('#tmodal');m.classList.add('open');m.setAttribute('aria-hidden','false');
+ document.body.style.overflow='hidden';
+ $('#tm-close').focus();
+}
+function closeMember(){
+ const m=$('#tmodal');m.classList.remove('open');m.setAttribute('aria-hidden','true');
+ document.body.style.overflow='';
+ if(tmLast&&tmLast.focus)tmLast.focus();
+}
+$('#team-grid').addEventListener('click',e=>{
+ if(e.target.closest('a'))return;
+ const c=e.target.closest('.tcard');if(c)openMember(+c.dataset.i);
+});
+$('#tm-close').onclick=closeMember;
+$('#tm-prev').onclick=()=>fillMember(tmIdx-1);
+$('#tm-next').onclick=()=>fillMember(tmIdx+1);
+$('#tmodal').addEventListener('click',e=>{if(e.target.id==='tmodal')closeMember()});
+document.addEventListener('keydown',e=>{
+ if(!$('#tmodal').classList.contains('open'))return;
+ if(e.key==='Escape')closeMember();
+ else if(e.key==='ArrowLeft')fillMember(tmIdx-1);
+ else if(e.key==='ArrowRight')fillMember(tmIdx+1);
+ else if(e.key==='Tab'){ // focus bahar na jaye
+  const f=[...$('#tmodal').querySelectorAll('button,a[href]')].filter(x=>x.offsetParent!==null);
+  if(!f.length)return;
+  const a=f[0],z=f[f.length-1];
+  if(e.shiftKey&&document.activeElement===a){e.preventDefault();z.focus()}
+  else if(!e.shiftKey&&document.activeElement===z){e.preventDefault();a.focus()}
+ }
+});
 function renderReviews(inst){
  $('#reviews-grid').innerHTML=reviews.map(r=>`<div class="card tilt${inst?' in':''}" data-r>
   <div class="stars">${'★'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div><p>"${esc(r.review_text)}"</p><h3>${esc(r.client_name)}</h3></div>`).join('');

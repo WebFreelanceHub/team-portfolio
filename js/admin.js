@@ -4,7 +4,7 @@ const CFG = {
     ['title','Title','text',1],['description','Description','textarea'],['category','Category (Website / PHP / E-commerce)','text'],
     ['tech','Tech (comma separated)','array'],['demo_url','Live demo URL','text'],['github_url','GitHub URL','text'],['image_url','Screenshot','image']]},
   team: { label:'Team', title:'name', sub:'role', img:'photo_url', order:['sort_order',true], fields:[
-    ['name','Name','text',1],['role','Role','text'],['skills','Skills (comma separated)','array'],['linkedin_url','LinkedIn URL','text'],
+    ['name','Name','text',1],['role','Role','text'],['info','About / Bio (apne baare mein likho)','textarea'],['skills','Skills (comma separated)','array'],['linkedin_url','LinkedIn URL','text'],
     ['github_url','GitHub URL','text'],['sort_order','Order (0 = first)','number'],['photo_url','Photo','image']]},
   reviews: { label:'Reviews', title:'client_name', sub:'review_text', img:'photo_url', order:['created_at',false], fields:[
     ['client_name','Client name','text',1],['stars','Stars (1-5)','number'],['review_text','Review','textarea'],
@@ -73,14 +73,33 @@ function openForm(row){
   const c = CFG[cur];
   $('#frm').innerHTML = `<h3>${row?'Edit':'Add'} ${c.label.replace(/s$/,'')}</h3>` + c.fields.map(([k,l,t,req]) => {
     const v = row ? row[k] : '';
-    if (t==='textarea') return `<div><label>${l}</label><textarea name="${k}">${esc(v)}</textarea></div>`;
+    if (t==='textarea') return k==='info'
+      ? `<div><label>${l}</label><textarea name="${k}" rows="6" maxlength="600" id="infoTxt" placeholder="Apna intro, experience, kya pasand hai... (max 600 characters)">${esc(v)}</textarea><small id="infoCnt" style="color:var(--mut)">${(v||'').length} / 600</small></div>`
+      : `<div><label>${l}</label><textarea name="${k}">${esc(v)}</textarea></div>`;
     if (t==='array') return `<div><label>${l}</label><input name="${k}" value="${esc((v||[]).join(', '))}"></div>`;
     if (t==='number') return `<div><label>${l}</label><input type="number" name="${k}" value="${esc(v ?? (k==='stars'?5:0))}"></div>`;
     if (t==='checkbox') return `<label><input type="checkbox" name="${k}" ${v?'checked':''} style="width:auto"> ${l}</label>`;
-    if (t==='image') return `<div><label>${l}</label>${v?`<img src="${esc(v)}" alt="" style="width:70px;border-radius:8px;display:block;margin-bottom:6px">`:''}<input type="file" name="${k}" accept="image/*"></div>`;
+    if (t==='image') return k==='photo_url'
+      ? `<div><label>${l}</label><div class="pv-wrap"><div class="pv" id="pv">${v?`<img src="${esc(v)}" alt="" style="object-position:50% 20%">`:'<span>No photo</span>'}</div>
+          <div class="pv-ctl"><input type="file" name="${k}" accept="image/*" id="photoFile">
+          <small>Koi bhi photo chalegi. Site par wo circle mein apne aap fit ho jayegi (face upar rehta hai).</small></div></div></div>`
+      : `<div><label>${l}</label>${v?`<img src="${esc(v)}" alt="" style="width:70px;border-radius:8px;display:block;margin-bottom:6px">`:''}<input type="file" name="${k}" accept="image/*"></div>`;
     return `<div><label>${l}${req?' *':''}</label><input name="${k}" value="${esc(v)}" ${req?'required':''}></div>`;
   }).join('') + `<div style="display:flex;gap:10px;justify-content:flex-end"><button type="button" class="ghost" id="cancel">Cancel</button><button type="submit">Save</button></div>`;
   $('#dlg').showModal();
+}
+
+/* Photo ko chhota (max 900px) + compress karta hai; crop nahi karta, circle mein fit CSS karti hai */
+async function resizeImage(file, max = 900){
+  try {
+    const bmp = await createImageBitmap(file, { imageOrientation:'from-image' });
+    const k = Math.min(1, max / Math.max(bmp.width, bmp.height));
+    const cv = document.createElement('canvas'); cv.width = Math.round(bmp.width*k); cv.height = Math.round(bmp.height*k);
+    const ctx = cv.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0,0,cv.width,cv.height);
+    ctx.drawImage(bmp, 0, 0, cv.width, cv.height);
+    const blob = await new Promise(r => cv.toBlob(r, 'image/jpeg', .88));
+    return blob ? new File([blob], file.name.replace(/\.[^.]+$/,'') + '.jpg', { type:'image/jpeg' }) : file;
+  } catch (e) { return file; }
 }
 
 async function uploadImage(file){
@@ -100,7 +119,13 @@ async function save(e){
       if (t==='array') out[k] = (fd.get(k)||'').split(',').map(s=>s.trim()).filter(Boolean);
       else if (t==='number') out[k] = Number(fd.get(k)) || 0;
       else if (t==='checkbox') out[k] = fd.get(k) === 'on';
-      else if (t==='image') { const f = fd.get(k); if (f && f.size) out[k] = await uploadImage(f); }
+      else if (t==='image') {
+        let f = fd.get(k);
+        if (f && f.size) {
+          if (k==='photo_url') f = await resizeImage(f);
+          out[k] = await uploadImage(f);
+        }
+      }
       else out[k] = (fd.get(k)||'').trim() || null;
     }
     if (cur==='reviews') out.stars = Math.min(5, Math.max(1, out.stars));
@@ -133,6 +158,14 @@ $('#logoutBtn').onclick = logout;
 $('#addBtn').onclick = () => openForm(null);
 $('#tabs').onclick = e => e.target.dataset.t && switchTab(e.target.dataset.t);
 $('#frm').addEventListener('submit', save);
+$('#frm').addEventListener('change', e => {
+  if (e.target.id !== 'photoFile') return;
+  const f = e.target.files[0]; if (!f) return;
+  $('#pv').innerHTML = `<img src="${URL.createObjectURL(f)}" alt="" style="object-position:50% 20%">`;
+});
+$('#frm').addEventListener('input', e => {
+  if (e.target.id === 'infoTxt') $('#infoCnt').textContent = `${e.target.value.length} / 600`;
+});
 $('#frm').addEventListener('click', e => e.target.id==='cancel' && $('#dlg').close());
 $('#list').onclick = e => {
   const b = e.target.closest('button[data-a]'); if (!b) return;
